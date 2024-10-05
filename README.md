@@ -79,7 +79,7 @@ Career Prediction Dataset
     A and E 
     Numerical aptitude vs A_score 
 
-Numerical aptitude vs N_score 
+Numerical aptitude vs N_score /// Done
 
 Numerical aptitude vs abstarct 
 
