@@ -115,42 +115,93 @@ graphs = update_graphs(df, categories)
 
 
 
+# mean Categories and their mean values for each score/aptitude
+categories_m = list(mean_by_category.keys())
+scores = list(mean_by_category[categories_m[0]].keys())
+
+# Prepare the data for the bar chart
+data = []
+for category in categories_m:
+    data.append(go.Bar(
+        x=scores,
+        y=[mean_by_category[category][score] for score in scores],
+        name=category
+    ))
+# Layout for the chart
+layout = go.Layout(
+    title='Comparison of Mean Scores and Aptitudes by Category',
+    xaxis=dict(title='Scores/Aptitude'),
+    yaxis=dict(title='Mean Values'),
+    barmode='group',
+    legend=dict(title='Category'),
+    margin=dict(l=40, r=40, t=40, b=120)
+)
+
+# Create the figure
+mean_fig = go.Figure(data=data, layout=layout)
+
+
+
+
+
+
+
+
+
+
 
 
 # Create scatter plot with regression line using Plotly
-fig = go.Figure()
+def createScatteredPlotWithRegressionline(xparam, yparam, figname):
+    """
+    Creates a scatter plot with a regression line using the given parameters.
 
-# Add scatter plot for C_score vs Numerical Aptitude
-fig.add_trace(go.Scatter(
-    x=df['C_score'],
-    y=df['Numerical Aptitude'],
-    mode='markers',
-    marker=dict(color='blue', opacity=0.5),
-    name='Data points'
-))
+    Parameters:
+    df (DataFrame): The DataFrame containing the data.
+    xparam (str): The column name for the x-axis data.
+    yparam (str): The column name for the y-axis data.
+    figname (str): The title of the figure.
 
-# Calculate regression line (m, b)
-m, b = np.polyfit(df['C_score'], df['Numerical Aptitude'], 1)
+    Returns:
+    fig (Figure): A Plotly Figure object with the scatter plot and regression line.
+    """
+    fig = go.Figure()
 
-# Add regression line to the plot
-fig.add_trace(go.Scatter(
-    x=df['C_score'],
-    y=m * df['C_score'] + b,
-    mode='lines',
-    line=dict(color='red'),
-    name='Regression Line'
-))
+    # Add scatter plot for the data points
+    fig.add_trace(go.Scatter(
+        x=df[xparam],
+        y=df[yparam],
+        mode='markers',
+        marker=dict(color='blue', opacity=0.5),
+        name='Data points'
+    ))
 
-# Add labels and title
-fig.update_layout(
-    title="Relationship Between Conscientiousness (C_score) and Numerical Aptitude",
-    xaxis_title="Conscientiousness (C_score)",
-    yaxis_title="Numerical Aptitude",
-    showlegend=True
-)
+    # Calculate the regression line parameters (slope m and intercept b)
+    m, b = np.polyfit(df[xparam], df[yparam], 1)
 
+    # Add the regression line to the plot
+    fig.add_trace(go.Scatter(
+        x=df[xparam],
+        y=m * df[xparam] + b,
+        mode='lines',
+        line=dict(color='red'),
+        name='Regression Line'
+    ))
 
+    # Add labels and title to the plot
+    fig.update_layout(
+        title=f"Relationship Between {xparam} and {yparam}",
+        xaxis_title=xparam,
+        yaxis_title=yparam,
+        showlegend=True
+    )
 
+    return fig
+
+fig = createScatteredPlotWithRegressionline('C_score', 'Numerical Aptitude', 'Conscientiousness vs Numerical Aptitude')
+figii = createScatteredPlotWithRegressionline('O_score', 'Abstract Reasoning', 'Openness vs Abstract Reasoning')
+figiii = createScatteredPlotWithRegressionline('N_score', 'Perceptual Aptitude', 'Conscientiousness vs Numerical Aptitude')
+figiv = createScatteredPlotWithRegressionline('E_score', 'Verbal Reasoning', 'Extraversion score vs Verbal Reasoning')
 
 
 
@@ -173,14 +224,21 @@ app.layout= html.Div([
     html.Div([
         html.Div(
             [
-                dcc.Graph(figure=graph, style={'display': 'inline-block', 'width': '25%'}) for graph in graphs
+                dcc.Graph(figure=graph, style={'display': 'inline-block'}, className='graphfig') for graph in graphs
             ]
         ),
     ], className='graph', style={'margin-top': '20px'}),
+    html.H4('GROUPED BAR CHART FOR CAREER CATEGORIES', className='titleText text_center'),
+        dcc.Graph(
+            id='grouped-bar-chart',
+            figure=mean_fig
+        ),
+
+    html.H4('ANALYTICS BASED ON CAREER CATEGORY', className='titleText text_center'),
 
     # main section
     html.Div([
-        # Dominant wiith big and small
+        # Dominant with big and small
         html.Div([
             html.Div([
 
@@ -195,10 +253,10 @@ app.layout= html.Div([
                                 html.Tr([
                                     html.Td('Career'),
                                     html.Td('Cognitive Aptitude Score'),
-                                    html.Td('Emotional Stability Index'),
-                                    html.Td('Openness and Creativity Index'),
-                                    html.Td('Problem Solving Efficiency'),
-                                    html.Td('Social-Cognitive Index')
+                                    html.Td('Emotional Stability Index ((A + E + N)/3)'),
+                                    html.Td('Openness and Creativity Index ((O + Abst)/2)'),
+                                    html.Td('Problem Solving Efficiency ((Num + Per + Abst)/ 3)'),
+                                    html.Td('Social-Cognitive Index ((A + E + Ver)/3)')
                                 ], className='header_hover')
                             ]),
                             html.Tbody([
@@ -214,10 +272,11 @@ app.layout= html.Div([
                         ], className="table_style")
                     ], className="table dominant-column card_outline", style={'overflow': 'scroll'}),
                     html.Div([], style={'height': '30px'}),
+                    # Relationship fig 1
                     html.Div([
                         dcc.Graph(figure=fig)
                     ], className='dominant-column card_outline'),
-                ]),
+                ], className=''),
 
                 # html.Div("Juxtaposed Content", className='juxtaposed-column'),
                 html.Div([
@@ -229,7 +288,7 @@ app.layout= html.Div([
                 ], className='card_outline trans sub_column'
                          ),
             ], className='flex_row flex_row_stretch')
-        ], className='flex-col'),
+        ], className='dominant'),
 
         # artcle balanced column
         html.Div([
@@ -247,8 +306,45 @@ app.layout= html.Div([
             ])
 
         ], className='balanced-column card'),
-    ], className='mainContainer flex_row flex_row_stretch')
+    ], className='mainContainer flex_row flex_row_stretch'),
 
+    # Research Question
+    html.Div([
+        html.H4('RESEARCH OBSERVATION', className='titleText text_center'),
+        html.P("Research Question 1: How do personality traits (O_score, C_score, E_score, A_score, N_score) influence career choice? ", className='qt'),
+        html.Div("Observation: Individuals with high Openness to Experience (O_score) are more likely to pursue creative careers, while those with high Conscientiousness (C_score) are more likely to pursue structured, detail-oriented careers (e.g., accounting, law).  ", className='card_outline'),
+
+        html.P(
+            "Research Question 2: Is there a correlation between personality traits (Big Five scores) and cognitive aptitudes (Numerical, Spatial, Perceptual, Abstract, Verbal Reasoning)? ", className='qt'),
+        html.Div([
+            html.Div([
+                dcc.Graph(figure=figii)
+            ], className='card_outline questioncol'),
+            html.Div([
+                dcc.Graph(figure=figiii)
+            ], className='card_outline questioncol'),
+        ], className="questionrow"),
+
+        html.P(
+            "Research Question 3: Can personality traits be used to predict cognitive aptitudes in a workplace context? ", className='qt'),
+        html.Div([
+            html.Div([
+                dcc.Graph(figure=fig)
+            ], className='card_outline questioncol'),
+            html.Div([
+                dcc.Graph(figure=figiv)
+            ], className='card_outline questioncol'),
+        ], className="questionrow"),
+
+        html.P("Research Question 4: Are certain careers more likely to attract individuals with specific combinations of aptitudes (Numerical, Spatial, Perceptual) and personality traits?", className='qt'),
+        html.Div([
+            html.P("Observation: Artistic careers are more likely to attract people with high Openness (O_score) and Abstract Reasoning, while technical careers (like IT or engineering) may attract people with higher Spatial Aptitude. ", className="card_outline", style={"width": "100%"})
+        ], className="questionrow"),
+
+    ], className=''),
+
+
+    html.P("One Prediction at a time @ 2024", className="text_center footer")
 ], className='Container flex_col')
 # This is a sample Python script.
 

@@ -2,7 +2,7 @@ body {
     background-color: rgb(243, 245, 245);;
     font-family: Arial, sans-serif;
     color:  #002433;
-    max-width; 100% !important;
+    max-width: 100% !important;
     }
 
 .card{
@@ -19,7 +19,7 @@ body {
 }
 .card_outline:hover{
     border: transparent;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.1);
 }
 
 .Container{
@@ -38,16 +38,39 @@ body {
     margin-top: -20px;
         color: rgba(6, 41, 41, 0.8);
 }
+.titleText{
+    margin-top: 40px;
+        color: rgba(6, 41, 41, 0.8);
+}
 .flex_row{
     display: flex;
     flex-direction: row;
 }
 .flex_col{
     display: flex;
-    flex-direction: column;
+    flex-direction: column !important;
 }
+.text_center{
+    text-align: center;
+}
+.questionrow{
+    display: flex;
+    justify-content: space-between;
+}
+.questionrow .card_outline:hover{
+    background-color: #fff;
+}
+.questioncol{
+    width: 46.6%;
 
-
+}
+.qt{
+    margin: 20px 0 10px 0;
+}
+.footer{
+    padding: 100px 0 5px;
+    color: #a1a1a1;
+}
 
 
 /* Main container styling */
@@ -55,7 +78,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    padding: 40px 0;
+    padding: 0 0 40px 0;
 }
 
 /* Flex row styling */
@@ -68,13 +91,15 @@ body {
 .sub_column{
     margin-right: 35px;
 
+
 }
 
 /* Dominant column */
 .dominant-column {
-    flex: 3;
     margin-right: 35px
-
+}
+.dominant{
+    flex: 3;
 }
 .trans{
     transition: transform 0.3s ease;
@@ -104,7 +129,7 @@ body {
 
 /* Balanced column */
 .balanced-column, .graph {
-    flex: 1.5;
+    flex: 1;
     background-color: #f0f0f0;
     font-size: 16px;
     padding: 30px;
@@ -112,7 +137,10 @@ body {
     text-align: center;
     transition: background-color 0.3s ease;
 }
+.graphfig{
+width: 25% !important;
 
+}
 .balanced-column:hover {
     background-color: #fff; /* Subtle color shift for balance */
 }
@@ -187,4 +215,9 @@ body {
     p{
         font-size: 12px;
     }
+    .graphfig{
+        width: 100% !important;
+        overflow-x: scroll !important;
+
+        }
 }
